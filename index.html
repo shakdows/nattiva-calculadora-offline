@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Calculadora de Hipoteca - Nattiva</title>
+  <title>Calculadora de Créditos Nattiva</title>
 
   <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
@@ -13,10 +13,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nattiva">
-  <link rel="apple-touch-icon" href="https://i.ibb.co/b5r6MYWJ/icon-512.png">
+  <link rel="apple-touch-icon" href="./icon-512.png">
 
-  <!-- Favicon PC -->
-  <link rel="icon" href="https://i.ibb.co/b5r6MYWJ/icon-512.png">
+  <!-- Favicon -->
+  <link rel="icon" href="./icon-512.png">
 
   <style>
     :root{
@@ -57,10 +57,14 @@
       border:1px solid rgba(148,163,184,.3);
     }
 
-    .logo{
-      width:180px;
-      display:block;
-      margin:10px auto 20px;
+    /* TÍTULO */
+    .title{
+      text-align:center;
+      font-size:22px;
+      font-weight:900;
+      color:#0f172a;
+      margin:8px 0 22px;
+      letter-spacing:0.02em;
     }
 
     .label{
@@ -162,13 +166,7 @@
 
 <!-- FORM -->
 <div class="card" id="form">
-  <img
-    src="https://i.ibb.co/b5r6MYWJ/icon-512.png"
-    class="logo"
-    alt="Nattiva"
-    loading="eager"
-    decoding="async"
-  >
+  <h1 class="title">Calculadora de Créditos Nattiva</h1>
 
   <div class="label">Cliente</div>
   <input id="cliente" placeholder="Ej: Juan Pérez">
@@ -191,13 +189,7 @@
 
 <!-- RESULTADO -->
 <div class="card hide" id="result">
-  <img
-    src="https://i.ibb.co/b5r6MYWJ/icon-512.png"
-    class="logo"
-    alt="Nattiva"
-    loading="eager"
-    decoding="async"
-  >
+  <h1 class="title">Calculadora de Créditos Nattiva</h1>
 
   <div class="bubble-blue">
     <span>CUOTA MENSUAL ESTIMADA</span>
@@ -223,7 +215,6 @@
   const nfi = new Intl.NumberFormat('en-US');
 
   function num(v){return parseFloat(v.replace(/,/g,''))||0}
-
   precio.oninput=()=>precio.value=nfi.format(num(precio.value));
 
   function calcular(){
