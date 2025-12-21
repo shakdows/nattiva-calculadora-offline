@@ -1,147 +1,210 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Calculadora Hipotecaria - Nattiva</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Calculadora Hipotecaria - Nattiva</title>
 
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#020617">
-<link rel="icon" href="icon-512.png">
-<link rel="apple-touch-icon" href="icon-512.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    :root{
+      --bg:#020617;
+      --card:#fff;
+      --shadow:rgba(15,23,42,.35);
+      --red:#e11d48;
+      --red2:#7f1d1d;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 
-<style>
-:root{
-  --bg:#020617;
-  --card:#fff;
-  --border:rgba(148,163,184,.35);
-  --shadow:rgba(15,23,42,.35);
-  --red:#e11d48;
-  --red2:#7f1d1d;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:system-ui}
+    body{
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:24px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56,189,248,.25), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(244,114,182,.25), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(251,191,36,.15), transparent 55%),
+        var(--bg);
+    }
 
-body{
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:24px;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(56,189,248,.25), transparent 55%),
-    radial-gradient(circle at 100% 0%, rgba(244,114,182,.25), transparent 55%),
-    radial-gradient(circle at 100% 100%, rgba(251,191,36,.15), transparent 55%),
-    var(--bg);
-}
+    .card{
+      width:100%;
+      max-width:520px;
+      background:var(--card);
+      border-radius:28px;
+      padding:26px 26px 28px;
+      box-shadow:0 22px 55px var(--shadow);
+    }
 
-.card{
-  width:100%;
-  max-width:420px;
-  background:var(--card);
-  border-radius:28px;
-  padding:24px;
-  box-shadow:0 22px 55px var(--shadow);
-}
+    .logo{
+      width:180px;
+      margin:4px auto 18px;
+      display:block;
+    }
 
-.logo{
-  width:180px;
-  margin:0 auto 18px;
-  display:block;
-}
+    label{
+      display:block;
+      font-size:11px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:#94a3b8;
+      margin-top:18px;
+      font-weight:700;
+    }
 
-label{
-  display:block;
-  font-size:11px;
-  letter-spacing:.22em;
-  color:#94a3b8;
-  margin-top:18px;
-}
+    input{
+      width:100%;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.55);
+      font-size:16px;
+      outline:none;
+    }
+    input:focus{
+      border-color:rgba(225,29,72,.55);
+      box-shadow:0 0 0 4px rgba(225,29,72,.12);
+    }
 
-input{
-  width:100%;
-  padding:14px;
-  border-radius:18px;
-  border:1px solid rgba(148,163,184,.55);
-  font-size:16px;
-}
+    button{
+      margin:26px auto 0;
+      display:block;
+      padding:14px 38px;
+      border-radius:999px;
+      border:0;
+      background:linear-gradient(135deg,var(--red),var(--red2));
+      color:#fff;
+      font-weight:800;
+      letter-spacing:.1em;
+      cursor:pointer;
+    }
 
-button{
-  margin:26px auto 0;
-  display:block;
-  padding:14px 38px;
-  border-radius:999px;
-  border:0;
-  background:linear-gradient(135deg,var(--red),var(--red2));
-  color:#fff;
-  font-weight:800;
-  letter-spacing:.1em;
-  cursor:pointer;
-}
+    .result{
+      margin-top:20px;
+      padding:18px 16px;
+      border-radius:22px;
+      background:linear-gradient(135deg,#e0f2fe,#fef9c3);
+      font-size:34px;
+      font-weight:900;
+      text-align:center;
+      color:#0f172a;
+    }
 
-.result{
-  margin-top:20px;
-  padding:18px;
-  border-radius:22px;
-  background:linear-gradient(135deg,#e0f2fe,#fef9c3);
-  font-size:34px;
-  font-weight:900;
-  text-align:center;
-}
-.hide{display:none}
-</style>
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(15,23,42,.65);
+      text-align:center;
+    }
+
+    .hide{display:none}
+  </style>
 </head>
 
 <body>
+  <div class="card">
+    <!-- Cambia SOLO el nombre del archivo si el tuyo se llama distinto -->
+    <img id="logo" class="logo" alt="Nattiva">
 
-<div class="card">
-<img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva">
+    <label>Cliente</label>
+    <input id="cliente" placeholder="Ej: Juan Pérez" value="">
 
-<label>CLIENTE</label>
-<input id="cliente">
+    <label>Precio del inmueble (S/)</label>
+    <input id="precio" inputmode="numeric" placeholder="Ej: 500,000" value="">
 
-<label>PRECIO DEL INMUEBLE (S/)</label>
-<input id="precio" placeholder="Ej: 500,000">
+    <label>Cuota inicial (%)</label>
+    <input id="cuotaInicial" inputmode="decimal" placeholder="Ej: 10" value="">
 
-<label>CUOTA INICIAL (%)</label>
-<input id="cuota" placeholder="Ej: 10">
+    <label>TEA (%)</label>
+    <input id="tea" inputmode="decimal" placeholder="Ej: 8" value="">
 
-<label>TEA (%)</label>
-<input id="tea" placeholder="Ej: 8">
+    <label>Plazo (años)</label>
+    <input id="plazo" inputmode="numeric" placeholder="Ej: 20" value="">
 
-<label>PLAZO (AÑOS)</label>
-<input id="plazo" placeholder="Ej: 20">
+    <button id="btnCalcular" type="button">CALCULAR</button>
 
-<button onclick="calcular()">CALCULAR</button>
-
-<div id="resultado" class="result hide"></div>
-</div>
+    <div id="resultado" class="result hide"></div>
+    <div id="debug" class="hint"></div>
+  </div>
 
 <script>
-const nf = new Intl.NumberFormat('en-US');
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) AJUSTA AQUÍ el nombre exacto del archivo del logo en tu repo:
+  const LOGO_FILE = 'nativa_2-removebg-preview.png'; // <-- cámbialo si tu archivo se llama diferente
+  const logoEl = document.getElementById('logo');
+  logoEl.src = LOGO_FILE;
 
-precio.addEventListener('input',()=>{
-  const n = precio.value.replace(/\D/g,'');
-  precio.value = n ? nf.format(n) : '';
-});
+  // 2) Referencias seguras (no dependemos de variables globales por ID)
+  const clienteEl = document.getElementById('cliente');
+  const precioEl = document.getElementById('precio');
+  const cuotaEl = document.getElementById('cuotaInicial');
+  const teaEl = document.getElementById('tea');
+  const plazoEl = document.getElementById('plazo');
+  const btnEl = document.getElementById('btnCalcular');
+  const resEl = document.getElementById('resultado');
+  const debugEl = document.getElementById('debug');
 
-function calcular(){
-  const P = parseInt(precio.value.replace(/\D/g,''),10);
-  const cuota = parseFloat(cuota.value);
-  const tea = parseFloat(tea.value)/100/12;
-  const n = parseInt(plazo.value,10)*12;
+  // 3) Formateo miles: 500000 -> 500,000 (sin decimales)
+  const nfMiles = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+  const nfMoney = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  if(!P||!cuota||!tea||!n){
-    alert("Completa todos los campos");
-    return;
+  function onlyDigits(s){ return (s || '').toString().replace(/[^\d]/g,''); }
+  function toInt(v){ const d = onlyDigits(v); return d ? parseInt(d, 10) : 0; }
+  function toFloat(v){
+    // acepta "8", "8.5", "8,5"
+    const s = (v || '').toString().replace(',', '.').trim();
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
   }
 
-  const monto = P*(1-cuota/100);
-  const m = monto*(tea*Math.pow(1+tea,n))/(Math.pow(1+tea,n)-1);
+  // Formatea mientras escribe (estable en iOS/Android)
+  precioEl.addEventListener('input', () => {
+    const n = toInt(precioEl.value);
+    precioEl.value = n ? nfMiles.format(n) : '';
+  });
 
-  resultado.textContent = "S/ " + nf.format(m.toFixed(2));
-  resultado.classList.remove('hide');
-}
+  // 4) Cálculo hipoteca (cuota mensual) fórmula estándar (PMT)
+  function calcularCuotaMensual(monto, tasaMensual, meses){
+    if (tasaMensual <= 0) return monto / meses;
+    const pow = Math.pow(1 + tasaMensual, meses);
+    return monto * (tasaMensual * pow) / (pow - 1);
+  }
+
+  btnEl.addEventListener('click', () => {
+    try {
+      debugEl.textContent = '';
+      resEl.classList.add('hide');
+
+      const precio = toInt(precioEl.value);
+      const cuotaInicialPct = toFloat(cuotaEl.value);
+      const teaPct = toFloat(teaEl.value);
+      const plazoAnios = toInt(plazoEl.value);
+
+      if (!precio) return alert('Ingresa un precio válido.');
+      if (!(cuotaInicialPct > 0 && cuotaInicialPct < 100)) return alert('Cuota inicial debe ser entre 0 y 100.');
+      if (!(teaPct > 0)) return alert('Ingresa una TEA válida.');
+      if (!(plazoAnios > 0)) return alert('Ingresa un plazo válido.');
+
+      const montoFinanciar = precio * (1 - (cuotaInicialPct / 100));
+      const meses = plazoAnios * 12;
+      const tasaMensual = (teaPct / 100) / 12;
+
+      const cuotaMensual = calcularCuotaMensual(montoFinanciar, tasaMensual, meses);
+
+      resEl.textContent = 'S/ ' + nfMoney.format(cuotaMensual);
+      resEl.classList.remove('hide');
+    } catch (e) {
+      console.error(e);
+      debugEl.textContent = 'Error: ' + (e && e.message ? e.message : 'revisar consola');
+      alert('Hubo un error. Revisa la consola (F12) o envíame captura del error.');
+    }
+  });
+
+  // Si el logo no carga, muestra aviso
+  logoEl.addEventListener('error', () => {
+    debugEl.textContent = 'No se encontró el logo. Verifica el nombre del archivo y que esté en el mismo nivel que index.html.';
+  });
+});
 </script>
 
 </body>
