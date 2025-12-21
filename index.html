@@ -1,333 +1,148 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Calculadora de Hipoteca - Nattiva</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Calculadora Hipotecaria - Nattiva</title>
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#020617">
-  <link rel="icon" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#020617">
+<link rel="icon" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
-  <!-- iOS (mejora “Agregar a pantalla de inicio”) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icon-512.png">
+<style>
+:root{
+  --bg:#020617;
+  --card:#fff;
+  --border:rgba(148,163,184,.35);
+  --shadow:rgba(15,23,42,.35);
+  --red:#e11d48;
+  --red2:#7f1d1d;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:system-ui}
 
-  <style>
-    :root{
-      --font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      --color-bg: #020617;
-      --color-card: #ffffff;
-      --color-border: rgba(148,163,184,.35);
-      --shadow: rgba(15,23,42,0.35);
+body{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(56,189,248,.25), transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(244,114,182,.25), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(251,191,36,.15), transparent 55%),
+    var(--bg);
+}
 
-      --cuota-blue:#e0f2fe;
-      --cuota-yellow:#fef9c3;
+.card{
+  width:100%;
+  max-width:420px;
+  background:var(--card);
+  border-radius:28px;
+  padding:24px;
+  box-shadow:0 22px 55px var(--shadow);
+}
 
-      --income-orange:#ffedd5;
-      --income-orange-2:#fde68a;
+.logo{
+  width:180px;
+  margin:0 auto 18px;
+  display:block;
+}
 
-      --button-red:#e11d48;
-      --button-red-dark:#7f1d1d;
+label{
+  display:block;
+  font-size:11px;
+  letter-spacing:.22em;
+  color:#94a3b8;
+  margin-top:18px;
+}
 
-      /* iOS safe areas */
-      --safe-t: env(safe-area-inset-top, 0px);
-      --safe-b: env(safe-area-inset-bottom, 0px);
-    }
+input{
+  width:100%;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(148,163,184,.55);
+  font-size:16px;
+}
 
-    * { box-sizing: border-box; }
+button{
+  margin:26px auto 0;
+  display:block;
+  padding:14px 38px;
+  border-radius:999px;
+  border:0;
+  background:linear-gradient(135deg,var(--red),var(--red2));
+  color:#fff;
+  font-weight:800;
+  letter-spacing:.1em;
+  cursor:pointer;
+}
 
-    html, body { height: 100%; margin: 0; }
-
-    /* Fondo fijo */
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(56,189,248,.25), transparent 55%),
-        radial-gradient(circle at 100% 0%, rgba(244,114,182,.25), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(251,191,36,.15), transparent 55%),
-        #020617;
-      transform: translateZ(0);
-    }
-
-    body{
-      font-family: var(--font-family);
-      min-height: 100dvh;
-      padding: calc(22px + var(--safe-t)) 16px calc(28px + var(--safe-b));
-      display: flex;
-      justify-content: center; /* CENTRADO REAL */
-      align-items: flex-start;
-      background: transparent;
-    }
-
-    /* Wrapper centrado y con ancho controlado */
-    .app-wrapper{
-      width: 100%;
-      max-width: 520px; /* una columna, centrada */
-      margin: 0 auto;
-    }
-
-    .card{
-      width: 100%;
-      background: var(--color-card);
-      border: 1px solid var(--color-border);
-      border-radius: 28px;
-      padding: 24px 20px 26px;
-      box-shadow: 0 22px 55px var(--shadow);
-      overflow: hidden;
-    }
-
-    .logo{
-      width: 180px;
-      max-width: 70%;
-      display: block;
-      margin: 10px auto 18px;
-    }
-
-    .label{
-      font-size: 11px;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: #94a3b8;
-      font-weight: 700;
-      margin: 18px 0 7px;
-    }
-
-    input{
-      width: 100%;
-      padding: 14px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.55);
-      font-size: 16px;
-      outline: none;
-      color: #0f172a;
-      background: #fff;
-    }
-
-    input::placeholder{ color: #94a3b8; }
-
-    input:focus{
-      border-color: rgba(225,29,72,.55);
-      box-shadow: 0 0 0 4px rgba(225,29,72,.12);
-    }
-
-    button{
-      padding: 14px 38px;
-      border-radius: 999px;
-      background: linear-gradient(135deg,var(--button-red),var(--button-red-dark));
-      color: #fff;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: .10em;
-      border: 0;
-      cursor: pointer;
-      display: block;
-      margin: 24px auto 0;
-    }
-
-    .hide{ display:none; }
-
-    .bubble-blue{
-      margin: 16px 0 18px;
-      padding: 22px 16px;
-      border-radius: 26px;
-      background: linear-gradient(135deg,var(--cuota-blue),var(--cuota-yellow));
-      text-align: center;
-      font-size: 36px;
-      font-weight: 900;
-      color: #0f172a;
-    }
-
-    table{
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
-      margin-top: 8px;
-    }
-
-    td{
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(148,163,184,.25);
-    }
-
-    tr:last-child td{ border-bottom: none; }
-
-    td:last-child{
-      text-align: right;
-      font-weight: 800;
-      color: #0f172a;
-      white-space: nowrap;
-      padding-left: 12px;
-    }
-
-    .bubble-orange{
-      margin: 18px 0 0;
-      padding: 20px 16px;
-      border-radius: 26px;
-      background: linear-gradient(135deg,var(--income-orange),var(--income-orange-2));
-      text-align: center;
-      font-size: 28px;
-      font-weight: 900;
-      color: #78350f;
-    }
-
-    /* Celular: card grande y centrada, sin “pegado arriba” */
-    @media (max-width: 520px){
-      body{
-        padding: calc(10px + var(--safe-t)) 12px calc(16px + var(--safe-b));
-      }
-      .card{ padding: 22px 18px 24px; }
-      .bubble-blue{ font-size: 34px; }
-      .bubble-orange{ font-size: 26px; }
-    }
-  </style>
+.result{
+  margin-top:20px;
+  padding:18px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#e0f2fe,#fef9c3);
+  font-size:34px;
+  font-weight:900;
+  text-align:center;
+}
+.hide{display:none}
+</style>
 </head>
 
 <body>
-  <div class="app-wrapper">
 
-    <!-- FORM -->
-    <div class="card" id="screenForm">
-      <img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva">
+<div class="card">
+<img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva">
 
-      <div class="label">Cliente</div>
-      <input id="nombreCliente" placeholder="Ej: Juan Pérez" value="">
+<label>CLIENTE</label>
+<input id="cliente">
 
-      <div class="label">Precio del inmueble (S/)</div>
-      <input id="precioInmueble" inputmode="numeric" placeholder="Ej: 500,000" value="">
+<label>PRECIO DEL INMUEBLE (S/)</label>
+<input id="precio" placeholder="Ej: 500,000">
 
-      <div class="label">Cuota inicial (%)</div>
-      <input id="cuotaInicialPorcentaje" inputmode="decimal" placeholder="Ej: 10" value="">
+<label>CUOTA INICIAL (%)</label>
+<input id="cuota" placeholder="Ej: 10">
 
-      <div class="label">TEA (%)</div>
-      <input id="tasaAnualPorcentaje" inputmode="decimal" placeholder="Ej: 10" value="">
+<label>TEA (%)</label>
+<input id="tea" placeholder="Ej: 8">
 
-      <div class="label">Plazo (años)</div>
-      <input id="plazoAnios" inputmode="numeric" placeholder="Ej: 20" value="">
+<label>PLAZO (AÑOS)</label>
+<input id="plazo" placeholder="Ej: 20">
 
-      <button id="btnCalcular">CALCULAR</button>
-    </div>
+<button onclick="calcular()">CALCULAR</button>
 
-    <!-- RESULTADO -->
-    <div class="card hide" id="screenResult">
-      <img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva">
+<div id="resultado" class="result hide"></div>
+</div>
 
-      <div class="bubble-blue" id="cuotaMensualFormatoOut"></div>
+<script>
+const nf = new Intl.NumberFormat('en-US');
 
-      <table>
-        <tr><td>Precio del inmueble</td><td id="precioInmuebleFormatoOut"></td></tr>
-        <tr><td>Cuota inicial</td><td id="cuotaInicialFormatoOut"></td></tr>
-        <tr><td>Monto a financiar</td><td id="montoFinanciarFormatoOut"></td></tr>
-        <tr><td>Plazo</td><td id="plazoAniosOut"></td></tr>
-        <tr><td>TEA</td><td id="tasaAnualPorcentajeOut"></td></tr>
-      </table>
+precio.addEventListener('input',()=>{
+  const n = precio.value.replace(/\D/g,'');
+  precio.value = n ? nf.format(n) : '';
+});
 
-      <div class="bubble-orange" id="ingresoAproxFormatoOut"></div>
+function calcular(){
+  const P = parseInt(precio.value.replace(/\D/g,''),10);
+  const cuota = parseFloat(cuota.value);
+  const tea = parseFloat(tea.value)/100/12;
+  const n = parseInt(plazo.value,10)*12;
 
-      <button id="btnNueva">NUEVA CONSULTA</button>
-    </div>
+  if(!P||!cuota||!tea||!n){
+    alert("Completa todos los campos");
+    return;
+  }
 
-  </div>
+  const monto = P*(1-cuota/100);
+  const m = monto*(tea*Math.pow(1+tea,n))/(Math.pow(1+tea,n)-1);
 
-  <script>
-    // ---- formateo miles: 500000 -> 500,000 (sin decimales) ----
-    const nfMiles = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+  resultado.textContent = "S/ " + nf.format(m.toFixed(2));
+  resultado.classList.remove('hide');
+}
+</script>
 
-    function onlyDigits(s){
-      return (s || '').toString().replace(/[^\d]/g,'');
-    }
-
-    function toIntMoney(v){
-      const d = onlyDigits(v);
-      return d ? parseInt(d, 10) : 0;
-    }
-
-    // Formatea mientras escribe (simple: cursor al final)
-    function formatThousands(el){
-      const n = toIntMoney(el.value);
-      el.value = n ? nfMiles.format(n) : '';
-    }
-
-    // Listener: precio formateado en vivo
-    const precioEl = document.getElementById('precioInmueble');
-    precioEl.addEventListener('input', () => formatThousands(precioEl));
-
-    // Botones
-    const btnCalcular = document.getElementById('btnCalcular');
-    const btnNueva = document.getElementById('btnNueva');
-
-    // Pantallas
-    const screenForm = document.getElementById('screenForm');
-    const screenResult = document.getElementById('screenResult');
-
-    // Inputs
-    const nombreCliente = document.getElementById('nombreCliente');
-    const cuotaInicialPorcentaje = document.getElementById('cuotaInicialPorcentaje');
-    const tasaAnualPorcentaje = document.getElementById('tasaAnualPorcentaje');
-    const plazoAnios = document.getElementById('plazoAnios');
-
-    // Outputs
-    const cuotaMensualFormatoOut = document.getElementById('cuotaMensualFormatoOut');
-    const precioInmuebleFormatoOut = document.getElementById('precioInmuebleFormatoOut');
-    const cuotaInicialFormatoOut = document.getElementById('cuotaInicialFormatoOut');
-    const montoFinanciarFormatoOut = document.getElementById('montoFinanciarFormatoOut');
-    const plazoAniosOut = document.getElementById('plazoAniosOut');
-    const tasaAnualPorcentajeOut = document.getElementById('tasaAnualPorcentajeOut');
-    const ingresoAproxFormatoOut = document.getElementById('ingresoAproxFormatoOut');
-
-    btnCalcular.onclick = () => {
-      const payload = {
-        nombreCliente: (nombreCliente.value || '').trim(),
-        precioInmueble: toIntMoney(precioEl.value),
-        cuotaInicialPorcentaje: parseFloat((cuotaInicialPorcentaje.value || '').replace(',', '.')) || 0,
-        tasaAnualPorcentaje: parseFloat((tasaAnualPorcentaje.value || '').replace(',', '.')) || 0,
-        plazoAnios: parseInt(plazoAnios.value || '0', 10) || 0
-      };
-
-      // Validación mínima
-      if (!payload.precioInmueble) return alert('Ingresa un precio de inmueble válido.');
-      if (!payload.cuotaInicialPorcentaje) return alert('Ingresa la cuota inicial (%).');
-      if (!payload.tasaAnualPorcentaje) return alert('Ingresa la TEA (%).');
-      if (!payload.plazoAnios) return alert('Ingresa el plazo (años).');
-
-      // IMPORTANTE:
-      // Aquí asumo que tu función Nattiva.calcular existe en tu APK (Android WebView).
-      // En GitHub Pages (solo web), si no existe, dará error. Si quieres que calcule también en web,
-      // me dices y lo pongo 100% en JS.
-      const r = JSON.parse(Nattiva.calcular(JSON.stringify(payload)));
-
-      screenForm.classList.add('hide');
-      screenResult.classList.remove('hide');
-
-      cuotaMensualFormatoOut.textContent = "S/ " + (r.cuotaMensualFormato || "");
-      precioInmuebleFormatoOut.textContent = "S/ " + (r.precioInmuebleFormato || "");
-      cuotaInicialFormatoOut.textContent = "S/ " + (r.cuotaInicialFormato || "");
-      montoFinanciarFormatoOut.textContent = "S/ " + (r.montoFinanciarFormato || "");
-      plazoAniosOut.textContent = (r.plazoAnios ?? "") + " años";
-      tasaAnualPorcentajeOut.textContent = (r.tasaAnualPorcentaje ?? "") + " %";
-      ingresoAproxFormatoOut.textContent = "S/ " + (r.ingresoAproxFormato || "");
-
-      window.scrollTo(0,0);
-    };
-
-    btnNueva.onclick = () => {
-      screenResult.classList.add('hide');
-      screenForm.classList.remove('hide');
-
-      // Limpia campos para que vuelvan en blanco
-      nombreCliente.value = '';
-      precioEl.value = '';
-      cuotaInicialPorcentaje.value = '';
-      tasaAnualPorcentaje.value = '';
-      plazoAnios.value = '';
-
-      window.scrollTo(0,0);
-    };
-  </script>
 </body>
 </html>
