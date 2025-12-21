@@ -1,8 +1,7 @@
 {
-  "name": "Calculadora de Hipoteca - Nattiva",
+  "name": "Calculadora Hipotecaria Nattiva",
   "short_name": "Nattiva",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#020617",
