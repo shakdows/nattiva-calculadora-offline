@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Calculadora de Hipoteca - Nattiva</title>
 
-  <!-- PWA / iOS -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0b1c2a">
+  <!-- PWA / Android -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#020617">
+
+  <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nattiva">
-  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="apple-touch-icon" href="./icon-512.png">
+
+  <!-- Favicon PC -->
+  <link rel="icon" href="./icon-512.png">
 
   <style>
     :root{
@@ -24,13 +29,11 @@
       --button-red:#e11d48;
       --button-red-dark:#7f1d1d;
 
-      /* iOS safe areas */
       --safe-t: env(safe-area-inset-top, 0px);
       --safe-b: env(safe-area-inset-bottom, 0px);
     }
 
     *{box-sizing:border-box}
-
     html, body { height: 100%; }
 
     body{
@@ -45,7 +48,6 @@
       padding: calc(18px + var(--safe-t)) 16px calc(26px + var(--safe-b));
     }
 
-    /* Centrado real en PC */
     .app-wrapper{
       max-width:1100px;
       margin:0 auto;
@@ -55,7 +57,6 @@
       justify-content:center;
     }
 
-    /* Una sola columna en móvil / 2 columnas en PC si quisieras crecer */
     .layout{
       width:100%;
       display:flex;
@@ -73,7 +74,6 @@
       max-width:520px;
     }
 
-    /* Header/logo */
     .logo{
       width:190px;
       height:auto;
@@ -153,6 +153,7 @@
       font-weight:900;
       color:#78350f;
     }
+
     .bubble-orange .small{
       display:block;
       font-size:11px;
@@ -213,13 +214,13 @@
 
       <!-- FORM -->
       <div class="card" id="screenForm">
-        <img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva" />
+        <!-- ✅ IMPORTANTE: el archivo debe existir en la raíz del repo con ese nombre exacto -->
+        <img src="./nativa_2-removebg-preview.png" class="logo" alt="Nattiva" />
 
         <div class="label">Cliente</div>
         <input id="nombreCliente" placeholder="Ej: Juan Pérez" value="" autocomplete="off" />
 
         <div class="label">Precio del inmueble (S/)</div>
-        <!-- requisito: 500000 -> 500,000 -->
         <input id="precioInmueble" inputmode="numeric" placeholder="Ej: 500,000" value="" autocomplete="off" />
 
         <div class="label">Cuota inicial (%)</div>
@@ -237,7 +238,7 @@
 
       <!-- RESULTADO -->
       <div class="card hide" id="screenResult">
-        <img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva" />
+        <img src="./nativa_2-removebg-preview.png" class="logo" alt="Nattiva" />
 
         <div class="bubble-blue">
           <span class="small">Cuota mensual estimada</span>
@@ -267,15 +268,15 @@
 
 <script>
   // =========================
-  //  FORMATO (como tu APK)
+  //  FORMATO (miles y dinero)
   // =========================
   const nfMoney = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const nfThousands = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
   function onlyDigits(s){ return (s || '').toString().replace(/[^\d]/g,''); }
   function toInt(v){ const d = onlyDigits(v); return d ? parseInt(d,10) : 0; }
+
   function toFloatSmart(v){
-    // permite "10" o "10.5" o "10,5"
     const s = (v || '').toString().trim().replace(',', '.');
     const n = parseFloat(s);
     return Number.isFinite(n) ? n : 0;
@@ -283,18 +284,17 @@
 
   function money(n){ return nfMoney.format(Number(n || 0)); }
 
-  // Input: precio del inmueble 500000 -> 500,000 (sin decimales)
-  const precioInmueble = document.getElementById('precioInmueble');
-  precioInmueble.addEventListener('input', () => {
-    const n = toInt(precioInmueble.value);
-    precioInmueble.value = n ? nfThousands.format(n) : '';
+  // 500000 -> 500,000
+  const precioInmuebleEl = document.getElementById('precioInmueble');
+  precioInmuebleEl.addEventListener('input', () => {
+    const n = toInt(precioInmuebleEl.value);
+    precioInmuebleEl.value = n ? nfThousands.format(n) : '';
   });
 
   // =========================
   //  CÁLCULO HIPOTECA (JS)
-  //  (equivalente a lo que normalmente haces en n8n)
   // =========================
-  function calcMortgage({ precioInmueble, cuotaInicialPorcentaje, tasaAnualPorcentaje, plazoAnios, nombreCliente }) {
+  function calcMortgage({ precioInmueble, cuotaInicialPorcentaje, tasaAnualPorcentaje, plazoAnios }) {
     const months = Math.round(plazoAnios * 12);
 
     const cuotaInicial = precioInmueble * (cuotaInicialPorcentaje / 100);
@@ -304,32 +304,18 @@
     const r = Math.pow(1 + (tasaAnualPorcentaje / 100), 1/12) - 1;
 
     let cuotaMensual = 0;
-    if (r === 0) {
-      cuotaMensual = montoFinanciar / months;
-    } else {
-      cuotaMensual = montoFinanciar * (r / (1 - Math.pow(1 + r, -months)));
-    }
+    if (months <= 0) cuotaMensual = 0;
+    else if (r === 0) cuotaMensual = montoFinanciar / months;
+    else cuotaMensual = montoFinanciar * (r / (1 - Math.pow(1 + r, -months)));
 
-    // Ingreso aprox (tu regla): cuota / 0.3
-    const ingresoAprox = cuotaMensual / 0.3;
+    // Regla típica: ingreso aprox si la cuota es 30% del ingreso
+    const ingresoAprox = cuotaMensual / 0.30;
 
     return {
-      nombreCliente: nombreCliente || '',
-      precioInmueble,
-      cuotaInicialPorcentaje,
-      tasaAnualPorcentaje,
-      plazoAnios,
+      cuotaMensual,
       cuotaInicial,
       montoFinanciar,
-      cuotaMensual,
-      ingresoAprox,
-
-      // Formatos como en tu salida
-      precioInmuebleFormato: money(precioInmueble),
-      cuotaInicialFormato: money(cuotaInicial),
-      montoFinanciarFormato: money(montoFinanciar),
-      cuotaMensualFormato: money(cuotaMensual),
-      ingresoAproxFormato: money(ingresoAprox),
+      ingresoAprox
     };
   }
 
@@ -340,10 +326,10 @@
   const screenResult = document.getElementById('screenResult');
   const err = document.getElementById('err');
 
-  const nombreCliente = document.getElementById('nombreCliente');
-  const cuotaInicialPorcentaje = document.getElementById('cuotaInicialPorcentaje');
-  const tasaAnualPorcentaje = document.getElementById('tasaAnualPorcentaje');
-  const plazoAnios = document.getElementById('plazoAnios');
+  const nombreClienteEl = document.getElementById('nombreCliente');
+  const cuotaInicialEl = document.getElementById('cuotaInicialPorcentaje');
+  const teaEl = document.getElementById('tasaAnualPorcentaje');
+  const plazoEl = document.getElementById('plazoAnios');
 
   function showError(msg){ err.textContent = msg || ''; }
 
@@ -361,41 +347,42 @@
   document.getElementById('btnCalcular').addEventListener('click', () => {
     showError('');
 
-    const payload = {
-      nombreCliente: (nombreCliente.value || '').trim(),
-      precioInmueble: toInt(precioInmueble.value),
-      cuotaInicialPorcentaje: toFloatSmart(cuotaInicialPorcentaje.value),
-      tasaAnualPorcentaje: toFloatSmart(tasaAnualPorcentaje.value),
-      plazoAnios: parseInt((plazoAnios.value || '').trim(), 10) || 0
-    };
+    const precio = toInt(precioInmuebleEl.value);
+    const cuotaPct = toFloatSmart(cuotaInicialEl.value);
+    const tea = toFloatSmart(teaEl.value);
+    const plazo = parseInt((plazoEl.value || '').trim(), 10) || 0;
 
-    if (!payload.precioInmueble || payload.precioInmueble <= 0) return showError('Ingresa un precio válido.');
-    if (!(payload.cuotaInicialPorcentaje > 0 && payload.cuotaInicialPorcentaje < 100)) return showError('Cuota inicial debe ser entre 1 y 99.');
-    if (!(payload.tasaAnualPorcentaje > 0)) return showError('Ingresa una TEA válida.');
-    if (!(payload.plazoAnios > 0)) return showError('Ingresa un plazo válido.');
+    if (!precio || precio <= 0) return showError('Ingresa un precio válido.');
+    if (!(cuotaPct > 0 && cuotaPct < 100)) return showError('Cuota inicial debe ser entre 1 y 99.');
+    if (!(tea > 0)) return showError('Ingresa una TEA válida.');
+    if (!(plazo > 0)) return showError('Ingresa un plazo válido.');
 
-    const r = calcMortgage(payload);
+    const { cuotaMensual, cuotaInicial, montoFinanciar, ingresoAprox } = calcMortgage({
+      precioInmueble: precio,
+      cuotaInicialPorcentaje: cuotaPct,
+      tasaAnualPorcentaje: tea,
+      plazoAnios: plazo
+    });
 
-    // Pintar resultados (como tu APK)
-    document.getElementById('cuotaMensualOut').textContent = "S/ " + r.cuotaMensualFormato;
-    document.getElementById('precioOut').textContent = "S/ " + r.precioInmuebleFormato;
-    document.getElementById('cuotaPctOut').textContent = r.cuotaInicialPorcentaje;
-    document.getElementById('cuotaIniOut').textContent = "S/ " + r.cuotaInicialFormato;
-    document.getElementById('montoOut').textContent = "S/ " + r.montoFinanciarFormato;
-    document.getElementById('plazoOut').textContent = r.plazoAnios + " años";
-    document.getElementById('teaOut').textContent = r.tasaAnualPorcentaje + " %";
-    document.getElementById('ingresoOut').textContent = "S/ " + r.ingresoAproxFormato;
+    // Pintar como APK
+    document.getElementById('cuotaMensualOut').textContent = "S/ " + money(cuotaMensual);
+    document.getElementById('precioOut').textContent = "S/ " + money(precio);
+    document.getElementById('cuotaPctOut').textContent = cuotaPct;
+    document.getElementById('cuotaIniOut').textContent = "S/ " + money(cuotaInicial);
+    document.getElementById('montoOut').textContent = "S/ " + money(montoFinanciar);
+    document.getElementById('plazoOut').textContent = plazo + " años";
+    document.getElementById('teaOut').textContent = tea + " %";
+    document.getElementById('ingresoOut').textContent = "S/ " + money(ingresoAprox);
 
     showResult();
   });
 
   document.getElementById('btnNueva').addEventListener('click', () => {
-    // limpiar para que esté TODO en blanco
-    nombreCliente.value = '';
-    precioInmueble.value = '';
-    cuotaInicialPorcentaje.value = '';
-    tasaAnualPorcentaje.value = '';
-    plazoAnios.value = '';
+    nombreClienteEl.value = '';
+    precioInmuebleEl.value = '';
+    cuotaInicialEl.value = '';
+    teaEl.value = '';
+    plazoEl.value = '';
     showError('');
     showForm();
   });
@@ -411,19 +398,3 @@
 </script>
 </body>
 </html>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => {
-          console.log('Service Worker registrado:', reg.scope);
-        })
-        .catch(err => {
-          console.error('Error registrando Service Worker:', err);
-        });
-    });
-  }
-</script>
-
-
