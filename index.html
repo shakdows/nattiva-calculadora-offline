@@ -57,14 +57,13 @@
       border:1px solid rgba(148,163,184,.3);
     }
 
-    /* TÍTULO */
     .title{
       text-align:center;
       font-size:22px;
       font-weight:900;
       color:#0f172a;
-      margin:8px 0 22px;
-      letter-spacing:0.02em;
+      margin:6px 0 22px;
+      letter-spacing:.02em;
     }
 
     .label{
@@ -82,6 +81,12 @@
       border-radius:18px;
       border:1px solid rgba(148,163,184,.55);
       font-size:16px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:rgba(225,29,72,.55);
+      box-shadow:0 0 0 4px rgba(225,29,72,.12);
     }
 
     button{
@@ -109,6 +114,7 @@
       text-align:center;
       font-size:36px;
       font-weight:900;
+      color:#0f172a;
     }
 
     .bubble-blue span{
@@ -117,6 +123,7 @@
       letter-spacing:.18em;
       font-weight:800;
       margin-bottom:8px;
+      color:#1d4ed8;
     }
 
     table{
@@ -128,6 +135,7 @@
     td{
       padding:12px 0;
       border-bottom:1px solid rgba(148,163,184,.25);
+      color:#0f172a;
     }
 
     td:last-child{
@@ -143,6 +151,7 @@
       text-align:center;
       font-size:28px;
       font-weight:900;
+      color:#78350f;
     }
 
     .note{
@@ -169,21 +178,21 @@
   <h1 class="title">Calculadora de Créditos Nattiva</h1>
 
   <div class="label">Cliente</div>
-  <input id="cliente" placeholder="Ej: Juan Pérez">
+  <input id="cliente" placeholder="Ej: Juan Pérez" autocomplete="off">
 
   <div class="label">Precio del inmueble (S/)</div>
-  <input id="precio" placeholder="Ej: 500,000">
+  <input id="precio" inputmode="numeric" placeholder="Ej: 500,000" autocomplete="off">
 
   <div class="label">Cuota inicial (%)</div>
-  <input id="cuota" placeholder="Ej: 10">
+  <input id="cuota" inputmode="decimal" placeholder="Ej: 10" autocomplete="off">
 
   <div class="label">TEA (%)</div>
-  <input id="tea" placeholder="Ej: 8">
+  <input id="tea" inputmode="decimal" placeholder="Ej: 8" autocomplete="off">
 
   <div class="label">Plazo (años)</div>
-  <input id="plazo" placeholder="Ej: 20">
+  <input id="plazo" inputmode="numeric" placeholder="Ej: 20" autocomplete="off">
 
-  <button onclick="calcular()">Calcular</button>
+  <button type="button" onclick="calcular()">Calcular</button>
   <div class="error" id="err"></div>
 </div>
 
@@ -207,30 +216,38 @@
   <div class="bubble-orange" id="outIngreso"></div>
   <div class="note">Estas cifras son referenciales y pueden variar.</div>
 
-  <button onclick="resetear()">Nueva consulta</button>
+  <button type="button" onclick="resetear()">Nueva consulta</button>
 </div>
 
 <script>
-  const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2});
-  const nfi = new Intl.NumberFormat('en-US');
+  const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+  const nfi = new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
 
-  function num(v){return parseFloat(v.replace(/,/g,''))||0}
-  precio.oninput=()=>precio.value=nfi.format(num(precio.value));
+  function onlyDigits(s){ return (s || '').toString().replace(/[^\d]/g,''); }
+  function num(v){ return parseFloat((v || '').toString().replace(/,/g,'')) || 0; }
+
+  // 500000 -> 500,000 (sin decimales)
+  precio.addEventListener('input', () => {
+    const d = onlyDigits(precio.value);
+    precio.value = d ? nfi.format(parseInt(d,10)) : '';
+  });
 
   function calcular(){
     err.textContent='';
-    const p=num(precio.value);
-    const c=num(cuota.value);
-    const t=num(tea.value);
-    const a=parseInt(plazo.value)||0;
-    if(!p||!c||!t||!a) return err.textContent='Completa todos los campos';
+    const p = num(precio.value);
+    const c = num(cuota.value);
+    const t = num(tea.value);
+    const a = parseInt(plazo.value) || 0;
 
-    const ci=p*(c/100);
-    const mf=p-ci;
-    const r=Math.pow(1+t/100,1/12)-1;
-    const m=a*12;
-    const cm=mf*(r/(1-Math.pow(1+r,-m)));
-    const ing=cm/0.3;
+    if(!p || !c || !t || !a) return err.textContent='Completa todos los campos';
+
+    const ci = p*(c/100);
+    const mf = p-ci;
+    const r  = Math.pow(1+t/100,1/12)-1;
+    const m  = a*12;
+
+    const cm = (r === 0) ? (mf/m) : (mf*(r/(1-Math.pow(1+r,-m))));
+    const ing = cm/0.3;
 
     cuotaMensual.textContent='S/ '+nf.format(cm);
     outPrecio.textContent='S/ '+nf.format(p);
@@ -249,8 +266,10 @@
     form.classList.remove('hide');
     result.classList.add('hide');
     cliente.value=precio.value=cuota.value=tea.value=plazo.value='';
+    err.textContent='';
   }
 
+  // Service Worker
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
