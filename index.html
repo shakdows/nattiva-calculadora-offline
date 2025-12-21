@@ -1,56 +1,69 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Calculadora Hipotecaria - Nattiva</title>
+
+  <!-- ✅ PWA / iOS -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#020617">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nattiva">
 
   <style>
     :root{
-      --bg:#020617;
-      --card:#fff;
-      --shadow:rgba(15,23,42,.35);
-      --red:#e11d48;
-      --red2:#7f1d1d;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #020617;
+      --shadow: rgba(15,23,42,.35);
+      --red: #e11d48;
+      --red-dark: #7f1d1d;
+      --blue: #e0f2fe;
+      --yellow: #fef9c3;
+      --orange: #ffedd5;
+      --orange2: #fde68a;
     }
+
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 
     body{
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      padding:24px;
+      margin:0;
+      min-height:100vh;
+      font-family:var(--font-family);
       background:
         radial-gradient(circle at 0% 0%, rgba(56,189,248,.25), transparent 55%),
         radial-gradient(circle at 100% 0%, rgba(244,114,182,.25), transparent 55%),
         radial-gradient(circle at 100% 100%, rgba(251,191,36,.15), transparent 55%),
         var(--bg);
+      display:flex;
+      justify-content:center;
+      align-items:center;
     }
 
     .card{
-      width:100%;
-      max-width:520px;
-      background:var(--card);
+      background:#fff;
       border-radius:28px;
-      padding:26px 26px 28px;
+      padding:26px 22px 30px;
+      width:100%;
+      max-width:420px;
       box-shadow:0 22px 55px var(--shadow);
     }
 
     .logo{
-      width:180px;
-      margin:4px auto 18px;
+      width:170px;
       display:block;
+      margin:10px auto 22px;
     }
 
-    label{
-      display:block;
+    .label{
       font-size:11px;
       letter-spacing:.22em;
       text-transform:uppercase;
       color:#94a3b8;
-      margin-top:18px;
       font-weight:700;
+      margin:18px 0 6px;
     }
 
     input{
@@ -61,6 +74,7 @@
       font-size:16px;
       outline:none;
     }
+
     input:focus{
       border-color:rgba(225,29,72,.55);
       box-shadow:0 0 0 4px rgba(225,29,72,.12);
@@ -69,142 +83,154 @@
     button{
       margin:26px auto 0;
       display:block;
-      padding:14px 38px;
+      padding:14px 36px;
       border-radius:999px;
-      border:0;
-      background:linear-gradient(135deg,var(--red),var(--red2));
+      background:linear-gradient(135deg,var(--red),var(--red-dark));
       color:#fff;
+      font-size:13px;
       font-weight:800;
       letter-spacing:.1em;
+      border:0;
       cursor:pointer;
     }
 
-    .result{
-      margin-top:20px;
-      padding:18px 16px;
-      border-radius:22px;
-      background:linear-gradient(135deg,#e0f2fe,#fef9c3);
+    .hide{display:none}
+
+    .bubble-blue{
+      margin:18px 0 22px;
+      padding:22px 16px;
+      border-radius:26px;
+      background:linear-gradient(135deg,var(--blue),var(--yellow));
+      text-align:center;
       font-size:34px;
       font-weight:900;
-      text-align:center;
-      color:#0f172a;
     }
 
-    .hint{
-      margin-top:10px;
-      font-size:12px;
-      color:rgba(15,23,42,.65);
+    .bubble-orange{
+      margin:22px 0;
+      padding:20px 16px;
+      border-radius:26px;
+      background:linear-gradient(135deg,var(--orange),var(--orange2));
       text-align:center;
+      font-size:26px;
+      font-weight:900;
     }
 
-    .hide{display:none}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:15px;
+    }
+
+    td{
+      padding:10px 0;
+      border-bottom:1px solid rgba(148,163,184,.25);
+    }
+
+    td:last-child{
+      text-align:right;
+      font-weight:800;
+    }
+
+    tr:last-child td{border-bottom:none}
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <!-- Cambia SOLO el nombre del archivo si el tuyo se llama distinto -->
-    <img id="logo" class="logo" alt="Nattiva">
 
-    <label>Cliente</label>
-    <input id="cliente" placeholder="Ej: Juan Pérez" value="">
+<div class="card" id="screenForm">
+  <img src="logo-nattiva.png" class="logo" alt="Nattiva">
 
-    <label>Precio del inmueble (S/)</label>
-    <input id="precio" inputmode="numeric" placeholder="Ej: 500,000" value="">
+  <div class="label">Cliente</div>
+  <input id="nombreCliente" placeholder="Ej: Juan Pérez">
 
-    <label>Cuota inicial (%)</label>
-    <input id="cuotaInicial" inputmode="decimal" placeholder="Ej: 10" value="">
+  <div class="label">Precio del inmueble (S/)</div>
+  <input id="precioInmueble" inputmode="numeric" placeholder="Ej: 500,000">
 
-    <label>TEA (%)</label>
-    <input id="tea" inputmode="decimal" placeholder="Ej: 8" value="">
+  <div class="label">Cuota inicial (%)</div>
+  <input id="cuotaInicialPorcentaje" inputmode="decimal" placeholder="Ej: 10">
 
-    <label>Plazo (años)</label>
-    <input id="plazo" inputmode="numeric" placeholder="Ej: 20" value="">
+  <div class="label">TEA (%)</div>
+  <input id="tasaAnualPorcentaje" inputmode="decimal" placeholder="Ej: 10">
 
-    <button id="btnCalcular" type="button">CALCULAR</button>
+  <div class="label">Plazo (años)</div>
+  <input id="plazoAnios" inputmode="numeric" placeholder="Ej: 20">
 
-    <div id="resultado" class="result hide"></div>
-    <div id="debug" class="hint"></div>
-  </div>
+  <button id="btnCalcular">CALCULAR</button>
+</div>
+
+<div class="card hide" id="screenResult">
+  <img src="logo-nattiva.png" class="logo" alt="Nattiva">
+
+  <div class="bubble-blue" id="cuotaMensual"></div>
+
+  <table>
+    <tr><td>Precio del inmueble</td><td id="outPrecio"></td></tr>
+    <tr><td>Cuota inicial</td><td id="outCuota"></td></tr>
+    <tr><td>Monto a financiar</td><td id="outMonto"></td></tr>
+    <tr><td>Plazo</td><td id="outPlazo"></td></tr>
+    <tr><td>TEA</td><td id="outTea"></td></tr>
+  </table>
+
+  <div class="bubble-orange" id="ingresoAprox"></div>
+
+  <button id="btnNueva">NUEVA CONSULTA</button>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // 1) AJUSTA AQUÍ el nombre exacto del archivo del logo en tu repo:
-  const LOGO_FILE = 'nativa_2-removebg-preview.png'; // <-- cámbialo si tu archivo se llama diferente
-  const logoEl = document.getElementById('logo');
-  logoEl.src = LOGO_FILE;
+  const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2});
+  const nf0 = new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
 
-  // 2) Referencias seguras (no dependemos de variables globales por ID)
-  const clienteEl = document.getElementById('cliente');
-  const precioEl = document.getElementById('precio');
-  const cuotaEl = document.getElementById('cuotaInicial');
-  const teaEl = document.getElementById('tea');
-  const plazoEl = document.getElementById('plazo');
-  const btnEl = document.getElementById('btnCalcular');
-  const resEl = document.getElementById('resultado');
-  const debugEl = document.getElementById('debug');
+  const clean = v => (v||'').replace(/[^\d]/g,'');
 
-  // 3) Formateo miles: 500000 -> 500,000 (sin decimales)
-  const nfMiles = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-  const nfMoney = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  function onlyDigits(s){ return (s || '').toString().replace(/[^\d]/g,''); }
-  function toInt(v){ const d = onlyDigits(v); return d ? parseInt(d, 10) : 0; }
-  function toFloat(v){
-    // acepta "8", "8.5", "8,5"
-    const s = (v || '').toString().replace(',', '.').trim();
-    const n = parseFloat(s);
-    return Number.isFinite(n) ? n : 0;
-  }
-
-  // Formatea mientras escribe (estable en iOS/Android)
-  precioEl.addEventListener('input', () => {
-    const n = toInt(precioEl.value);
-    precioEl.value = n ? nfMiles.format(n) : '';
+  precioInmueble.addEventListener('input', ()=>{
+    const n = clean(precioInmueble.value);
+    precioInmueble.value = n ? nf0.format(n) : '';
   });
 
-  // 4) Cálculo hipoteca (cuota mensual) fórmula estándar (PMT)
-  function calcularCuotaMensual(monto, tasaMensual, meses){
-    if (tasaMensual <= 0) return monto / meses;
-    const pow = Math.pow(1 + tasaMensual, meses);
-    return monto * (tasaMensual * pow) / (pow - 1);
-  }
+  btnCalcular.onclick = () => {
+    const precio = parseInt(clean(precioInmueble.value));
+    const cuotaPct = parseFloat(cuotaInicialPorcentaje.value);
+    const tea = parseFloat(tasaAnualPorcentaje.value) / 100;
+    const años = parseInt(plazoAnios.value);
 
-  btnEl.addEventListener('click', () => {
-    try {
-      debugEl.textContent = '';
-      resEl.classList.add('hide');
-
-      const precio = toInt(precioEl.value);
-      const cuotaInicialPct = toFloat(cuotaEl.value);
-      const teaPct = toFloat(teaEl.value);
-      const plazoAnios = toInt(plazoEl.value);
-
-      if (!precio) return alert('Ingresa un precio válido.');
-      if (!(cuotaInicialPct > 0 && cuotaInicialPct < 100)) return alert('Cuota inicial debe ser entre 0 y 100.');
-      if (!(teaPct > 0)) return alert('Ingresa una TEA válida.');
-      if (!(plazoAnios > 0)) return alert('Ingresa un plazo válido.');
-
-      const montoFinanciar = precio * (1 - (cuotaInicialPct / 100));
-      const meses = plazoAnios * 12;
-      const tasaMensual = (teaPct / 100) / 12;
-
-      const cuotaMensual = calcularCuotaMensual(montoFinanciar, tasaMensual, meses);
-
-      resEl.textContent = 'S/ ' + nfMoney.format(cuotaMensual);
-      resEl.classList.remove('hide');
-    } catch (e) {
-      console.error(e);
-      debugEl.textContent = 'Error: ' + (e && e.message ? e.message : 'revisar consola');
-      alert('Hubo un error. Revisa la consola (F12) o envíame captura del error.');
+    if(!precio||!cuotaPct||!tea||!años){
+      alert('Completa todos los campos');
+      return;
     }
-  });
 
-  // Si el logo no carga, muestra aviso
-  logoEl.addEventListener('error', () => {
-    debugEl.textContent = 'No se encontró el logo. Verifica el nombre del archivo y que esté en el mismo nivel que index.html.';
-  });
-});
+    const cuotaInicial = precio * (cuotaPct/100);
+    const monto = precio - cuotaInicial;
+    const meses = años * 12;
+    const tasaMensual = Math.pow(1+tea,1/12)-1;
+
+    const cuota =
+      monto * (tasaMensual * Math.pow(1+tasaMensual,meses)) /
+      (Math.pow(1+tasaMensual,meses)-1);
+
+    const ingresoAprox = cuota * 3.5;
+
+    screenForm.classList.add('hide');
+    screenResult.classList.remove('hide');
+
+    cuotaMensual.textContent = "S/ " + nf.format(cuota);
+    outPrecio.textContent = "S/ " + nf.format(precio);
+    outCuota.textContent = "S/ " + nf.format(cuotaInicial);
+    outMonto.textContent = "S/ " + nf.format(monto);
+    outPlazo.textContent = años + " años";
+    outTea.textContent = (tea*100).toFixed(2) + " %";
+    ingresoAprox.textContent = "S/ " + nf.format(ingresoAprox);
+  };
+
+  btnNueva.onclick = () => {
+    screenResult.classList.add('hide');
+    screenForm.classList.remove('hide');
+    nombreCliente.value='';
+    precioInmueble.value='';
+    cuotaInicialPorcentaje.value='';
+    tasaAnualPorcentaje.value='';
+    plazoAnios.value='';
+  };
 </script>
 
 </body>
