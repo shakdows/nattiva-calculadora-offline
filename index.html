@@ -2,31 +2,36 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Calculadora de Hipoteca - Nattiva</title>
 
-  <title>Calculadora Hipotecaria - Nattiva</title>
-
-  <!-- ✅ PWA / iOS -->
+  <!-- PWA / iOS -->
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#020617">
+  <meta name="theme-color" content="#0b1c2a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nattiva">
+  <link rel="apple-touch-icon" href="icon-512.png">
 
   <style>
     :root{
-      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --bg: #020617;
-      --shadow: rgba(15,23,42,.35);
-      --red: #e11d48;
-      --red-dark: #7f1d1d;
-      --blue: #e0f2fe;
-      --yellow: #fef9c3;
-      --orange: #ffedd5;
-      --orange2: #fde68a;
+      --font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --color-card-shadow:rgba(15,23,42,0.35);
+      --cuota-blue:#e0f2fe;
+      --cuota-yellow:#fef9c3;
+      --income-orange:#ffedd5;
+      --income-orange-2:#fde68a;
+      --button-red:#e11d48;
+      --button-red-dark:#7f1d1d;
+
+      /* iOS safe areas */
+      --safe-t: env(safe-area-inset-top, 0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
     }
 
     *{box-sizing:border-box}
+
+    html, body { height: 100%; }
 
     body{
       margin:0;
@@ -36,25 +41,44 @@
         radial-gradient(circle at 0% 0%, rgba(56,189,248,.25), transparent 55%),
         radial-gradient(circle at 100% 0%, rgba(244,114,182,.25), transparent 55%),
         radial-gradient(circle at 100% 100%, rgba(251,191,36,.15), transparent 55%),
-        var(--bg);
+        #020617;
+      padding: calc(18px + var(--safe-t)) 16px calc(26px + var(--safe-b));
+    }
+
+    /* Centrado real en PC */
+    .app-wrapper{
+      max-width:1100px;
+      margin:0 auto;
+      min-height: calc(100vh - (18px + var(--safe-t)) - (26px + var(--safe-b)));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Una sola columna en móvil / 2 columnas en PC si quisieras crecer */
+    .layout{
+      width:100%;
       display:flex;
       justify-content:center;
-      align-items:center;
+      align-items:flex-start;
     }
 
     .card{
       background:#fff;
       border-radius:28px;
-      padding:26px 22px 30px;
+      padding:26px 22px 28px;
+      box-shadow:0 22px 55px var(--color-card-shadow);
+      border:1px solid rgba(148,163,184,.30);
       width:100%;
-      max-width:420px;
-      box-shadow:0 22px 55px var(--shadow);
+      max-width:520px;
     }
 
+    /* Header/logo */
     .logo{
-      width:170px;
+      width:190px;
+      height:auto;
+      margin:10px auto 18px;
       display:block;
-      margin:10px auto 22px;
     }
 
     .label{
@@ -68,170 +92,322 @@
 
     input{
       width:100%;
-      padding:14px;
+      padding:14px 14px;
       border-radius:18px;
       border:1px solid rgba(148,163,184,.55);
       font-size:16px;
       outline:none;
+      color:#0f172a;
+      background:#fff;
     }
-
     input:focus{
       border-color:rgba(225,29,72,.55);
       box-shadow:0 0 0 4px rgba(225,29,72,.12);
     }
 
-    button{
-      margin:26px auto 0;
-      display:block;
+    .btn{
       padding:14px 36px;
       border-radius:999px;
-      background:linear-gradient(135deg,var(--red),var(--red-dark));
+      background:linear-gradient(135deg,var(--button-red),var(--button-red-dark));
       color:#fff;
       font-size:13px;
       font-weight:800;
-      letter-spacing:.1em;
+      letter-spacing:.10em;
       border:0;
       cursor:pointer;
+      display:block;
+      margin:26px auto 0;
+      text-transform:uppercase;
     }
 
-    .hide{display:none}
+    .hide{ display:none !important; }
 
     .bubble-blue{
-      margin:18px 0 22px;
+      margin:16px 0 18px;
       padding:22px 16px;
       border-radius:26px;
-      background:linear-gradient(135deg,var(--blue),var(--yellow));
+      background:linear-gradient(135deg,var(--cuota-blue),var(--cuota-yellow));
       text-align:center;
-      font-size:34px;
+      font-size:38px;
       font-weight:900;
+      color:#0f172a;
+    }
+
+    .bubble-blue .small{
+      display:block;
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#1d4ed8;
+      margin-bottom:8px;
     }
 
     .bubble-orange{
-      margin:22px 0;
+      margin:20px 0 10px;
       padding:20px 16px;
       border-radius:26px;
-      background:linear-gradient(135deg,var(--orange),var(--orange2));
+      background:linear-gradient(135deg,var(--income-orange),var(--income-orange-2));
       text-align:center;
-      font-size:26px;
+      font-size:30px;
       font-weight:900;
+      color:#78350f;
+    }
+    .bubble-orange .small{
+      display:block;
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#92400e;
+      margin-bottom:8px;
     }
 
     table{
       width:100%;
       border-collapse:collapse;
       font-size:15px;
+      margin-top:4px;
     }
-
     td{
-      padding:10px 0;
+      padding:12px 0;
       border-bottom:1px solid rgba(148,163,184,.25);
+      color:#0f172a;
     }
-
+    tr:last-child td{border-bottom:none}
     td:last-child{
       text-align:right;
-      font-weight:800;
+      font-weight:900;
+      color:#0f172a;
     }
 
-    tr:last-child td{border-bottom:none}
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:#64748b;
+      text-align:center;
+    }
+
+    .error{
+      margin-top:12px;
+      font-size:13px;
+      font-weight:800;
+      color:#b91c1c;
+      text-align:center;
+      min-height: 18px;
+    }
+
+    @media(max-width:420px){
+      body{ padding: calc(14px + var(--safe-t)) 12px calc(22px + var(--safe-b)); }
+      .card{ padding:22px 18px 24px; border-radius:26px; }
+      .bubble-blue{ font-size:34px; }
+      .bubble-orange{ font-size:26px; }
+      .logo{ width:170px; }
+    }
   </style>
 </head>
 
 <body>
+  <div class="app-wrapper">
+    <div class="layout">
 
-<div class="card" id="screenForm">
-  <img src="logo-nattiva.png" class="logo" alt="Nattiva">
+      <!-- FORM -->
+      <div class="card" id="screenForm">
+        <img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva" />
 
-  <div class="label">Cliente</div>
-  <input id="nombreCliente" placeholder="Ej: Juan Pérez">
+        <div class="label">Cliente</div>
+        <input id="nombreCliente" placeholder="Ej: Juan Pérez" value="" autocomplete="off" />
 
-  <div class="label">Precio del inmueble (S/)</div>
-  <input id="precioInmueble" inputmode="numeric" placeholder="Ej: 500,000">
+        <div class="label">Precio del inmueble (S/)</div>
+        <!-- requisito: 500000 -> 500,000 -->
+        <input id="precioInmueble" inputmode="numeric" placeholder="Ej: 500,000" value="" autocomplete="off" />
 
-  <div class="label">Cuota inicial (%)</div>
-  <input id="cuotaInicialPorcentaje" inputmode="decimal" placeholder="Ej: 10">
+        <div class="label">Cuota inicial (%)</div>
+        <input id="cuotaInicialPorcentaje" inputmode="decimal" placeholder="Ej: 10" value="" autocomplete="off" />
 
-  <div class="label">TEA (%)</div>
-  <input id="tasaAnualPorcentaje" inputmode="decimal" placeholder="Ej: 10">
+        <div class="label">TEA (%)</div>
+        <input id="tasaAnualPorcentaje" inputmode="decimal" placeholder="Ej: 10" value="" autocomplete="off" />
 
-  <div class="label">Plazo (años)</div>
-  <input id="plazoAnios" inputmode="numeric" placeholder="Ej: 20">
+        <div class="label">Plazo (años)</div>
+        <input id="plazoAnios" inputmode="numeric" placeholder="Ej: 20" value="" autocomplete="off" />
 
-  <button id="btnCalcular">CALCULAR</button>
-</div>
+        <button class="btn" id="btnCalcular" type="button">Calcular</button>
+        <div class="error" id="err"></div>
+      </div>
 
-<div class="card hide" id="screenResult">
-  <img src="logo-nattiva.png" class="logo" alt="Nattiva">
+      <!-- RESULTADO -->
+      <div class="card hide" id="screenResult">
+        <img src="nativa_2-removebg-preview.png" class="logo" alt="Nattiva" />
 
-  <div class="bubble-blue" id="cuotaMensual"></div>
+        <div class="bubble-blue">
+          <span class="small">Cuota mensual estimada</span>
+          <span id="cuotaMensualOut">S/ 0.00</span>
+        </div>
 
-  <table>
-    <tr><td>Precio del inmueble</td><td id="outPrecio"></td></tr>
-    <tr><td>Cuota inicial</td><td id="outCuota"></td></tr>
-    <tr><td>Monto a financiar</td><td id="outMonto"></td></tr>
-    <tr><td>Plazo</td><td id="outPlazo"></td></tr>
-    <tr><td>TEA</td><td id="outTea"></td></tr>
-  </table>
+        <table>
+          <tr><td>Precio del inmueble</td><td id="precioOut"></td></tr>
+          <tr><td>Cuota inicial (<span id="cuotaPctOut"></span>%)</td><td id="cuotaIniOut"></td></tr>
+          <tr><td>Monto a financiar</td><td id="montoOut"></td></tr>
+          <tr><td>Plazo</td><td id="plazoOut"></td></tr>
+          <tr><td>TEA referencial</td><td id="teaOut"></td></tr>
+        </table>
 
-  <div class="bubble-orange" id="ingresoAprox"></div>
+        <div class="bubble-orange">
+          <span class="small">Ingresos aproximados del cliente</span>
+          <span id="ingresoOut">S/ 0.00</span>
+        </div>
 
-  <button id="btnNueva">NUEVA CONSULTA</button>
-</div>
+        <div class="note">Estas cifras son referenciales y pueden variar.</div>
+
+        <button class="btn" id="btnNueva" type="button">Nueva consulta</button>
+      </div>
+
+    </div>
+  </div>
 
 <script>
-  const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2});
-  const nf0 = new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
+  // =========================
+  //  FORMATO (como tu APK)
+  // =========================
+  const nfMoney = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const nfThousands = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
-  const clean = v => (v||'').replace(/[^\d]/g,'');
+  function onlyDigits(s){ return (s || '').toString().replace(/[^\d]/g,''); }
+  function toInt(v){ const d = onlyDigits(v); return d ? parseInt(d,10) : 0; }
+  function toFloatSmart(v){
+    // permite "10" o "10.5" o "10,5"
+    const s = (v || '').toString().trim().replace(',', '.');
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : 0;
+  }
 
-  precioInmueble.addEventListener('input', ()=>{
-    const n = clean(precioInmueble.value);
-    precioInmueble.value = n ? nf0.format(n) : '';
+  function money(n){ return nfMoney.format(Number(n || 0)); }
+
+  // Input: precio del inmueble 500000 -> 500,000 (sin decimales)
+  const precioInmueble = document.getElementById('precioInmueble');
+  precioInmueble.addEventListener('input', () => {
+    const n = toInt(precioInmueble.value);
+    precioInmueble.value = n ? nfThousands.format(n) : '';
   });
 
-  btnCalcular.onclick = () => {
-    const precio = parseInt(clean(precioInmueble.value));
-    const cuotaPct = parseFloat(cuotaInicialPorcentaje.value);
-    const tea = parseFloat(tasaAnualPorcentaje.value) / 100;
-    const años = parseInt(plazoAnios.value);
+  // =========================
+  //  CÁLCULO HIPOTECA (JS)
+  //  (equivalente a lo que normalmente haces en n8n)
+  // =========================
+  function calcMortgage({ precioInmueble, cuotaInicialPorcentaje, tasaAnualPorcentaje, plazoAnios, nombreCliente }) {
+    const months = Math.round(plazoAnios * 12);
 
-    if(!precio||!cuotaPct||!tea||!años){
-      alert('Completa todos los campos');
-      return;
+    const cuotaInicial = precioInmueble * (cuotaInicialPorcentaje / 100);
+    const montoFinanciar = precioInmueble - cuotaInicial;
+
+    // TEA -> tasa mensual efectiva
+    const r = Math.pow(1 + (tasaAnualPorcentaje / 100), 1/12) - 1;
+
+    let cuotaMensual = 0;
+    if (r === 0) {
+      cuotaMensual = montoFinanciar / months;
+    } else {
+      cuotaMensual = montoFinanciar * (r / (1 - Math.pow(1 + r, -months)));
     }
 
-    const cuotaInicial = precio * (cuotaPct/100);
-    const monto = precio - cuotaInicial;
-    const meses = años * 12;
-    const tasaMensual = Math.pow(1+tea,1/12)-1;
+    // Ingreso aprox (tu regla): cuota / 0.3
+    const ingresoAprox = cuotaMensual / 0.3;
 
-    const cuota =
-      monto * (tasaMensual * Math.pow(1+tasaMensual,meses)) /
-      (Math.pow(1+tasaMensual,meses)-1);
+    return {
+      nombreCliente: nombreCliente || '',
+      precioInmueble,
+      cuotaInicialPorcentaje,
+      tasaAnualPorcentaje,
+      plazoAnios,
+      cuotaInicial,
+      montoFinanciar,
+      cuotaMensual,
+      ingresoAprox,
 
-    const ingresoAprox = cuota * 3.5;
+      // Formatos como en tu salida
+      precioInmuebleFormato: money(precioInmueble),
+      cuotaInicialFormato: money(cuotaInicial),
+      montoFinanciarFormato: money(montoFinanciar),
+      cuotaMensualFormato: money(cuotaMensual),
+      ingresoAproxFormato: money(ingresoAprox),
+    };
+  }
 
+  // =========================
+  //  UI
+  // =========================
+  const screenForm = document.getElementById('screenForm');
+  const screenResult = document.getElementById('screenResult');
+  const err = document.getElementById('err');
+
+  const nombreCliente = document.getElementById('nombreCliente');
+  const cuotaInicialPorcentaje = document.getElementById('cuotaInicialPorcentaje');
+  const tasaAnualPorcentaje = document.getElementById('tasaAnualPorcentaje');
+  const plazoAnios = document.getElementById('plazoAnios');
+
+  function showError(msg){ err.textContent = msg || ''; }
+
+  function showResult(){
     screenForm.classList.add('hide');
     screenResult.classList.remove('hide');
-
-    cuotaMensual.textContent = "S/ " + nf.format(cuota);
-    outPrecio.textContent = "S/ " + nf.format(precio);
-    outCuota.textContent = "S/ " + nf.format(cuotaInicial);
-    outMonto.textContent = "S/ " + nf.format(monto);
-    outPlazo.textContent = años + " años";
-    outTea.textContent = (tea*100).toFixed(2) + " %";
-    ingresoAprox.textContent = "S/ " + nf.format(ingresoAprox);
-  };
-
-  btnNueva.onclick = () => {
+    window.scrollTo(0,0);
+  }
+  function showForm(){
     screenResult.classList.add('hide');
     screenForm.classList.remove('hide');
-    nombreCliente.value='';
-    precioInmueble.value='';
-    cuotaInicialPorcentaje.value='';
-    tasaAnualPorcentaje.value='';
-    plazoAnios.value='';
-  };
-</script>
+    window.scrollTo(0,0);
+  }
 
+  document.getElementById('btnCalcular').addEventListener('click', () => {
+    showError('');
+
+    const payload = {
+      nombreCliente: (nombreCliente.value || '').trim(),
+      precioInmueble: toInt(precioInmueble.value),
+      cuotaInicialPorcentaje: toFloatSmart(cuotaInicialPorcentaje.value),
+      tasaAnualPorcentaje: toFloatSmart(tasaAnualPorcentaje.value),
+      plazoAnios: parseInt((plazoAnios.value || '').trim(), 10) || 0
+    };
+
+    if (!payload.precioInmueble || payload.precioInmueble <= 0) return showError('Ingresa un precio válido.');
+    if (!(payload.cuotaInicialPorcentaje > 0 && payload.cuotaInicialPorcentaje < 100)) return showError('Cuota inicial debe ser entre 1 y 99.');
+    if (!(payload.tasaAnualPorcentaje > 0)) return showError('Ingresa una TEA válida.');
+    if (!(payload.plazoAnios > 0)) return showError('Ingresa un plazo válido.');
+
+    const r = calcMortgage(payload);
+
+    // Pintar resultados (como tu APK)
+    document.getElementById('cuotaMensualOut').textContent = "S/ " + r.cuotaMensualFormato;
+    document.getElementById('precioOut').textContent = "S/ " + r.precioInmuebleFormato;
+    document.getElementById('cuotaPctOut').textContent = r.cuotaInicialPorcentaje;
+    document.getElementById('cuotaIniOut').textContent = "S/ " + r.cuotaInicialFormato;
+    document.getElementById('montoOut').textContent = "S/ " + r.montoFinanciarFormato;
+    document.getElementById('plazoOut').textContent = r.plazoAnios + " años";
+    document.getElementById('teaOut').textContent = r.tasaAnualPorcentaje + " %";
+    document.getElementById('ingresoOut').textContent = "S/ " + r.ingresoAproxFormato;
+
+    showResult();
+  });
+
+  document.getElementById('btnNueva').addEventListener('click', () => {
+    // limpiar para que esté TODO en blanco
+    nombreCliente.value = '';
+    precioInmueble.value = '';
+    cuotaInicialPorcentaje.value = '';
+    tasaAnualPorcentaje.value = '';
+    plazoAnios.value = '';
+    showError('');
+    showForm();
+  });
+
+  // =========================
+  //  Service Worker (offline)
+  // =========================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
