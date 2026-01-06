@@ -154,6 +154,17 @@
       color:#78350f;
     }
 
+    /* ✅ Título dentro de la burbuja naranja */
+    .bubble-orange span{
+      display:block;
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-weight:900;
+      margin-bottom:8px;
+      color:#92400e;
+    }
+
     .note{
       font-size:12px;
       color:#64748b;
@@ -213,7 +224,12 @@
     <tr><td>TEA</td><td id="outTea"></td></tr>
   </table>
 
-  <div class="bubble-orange" id="outIngreso"></div>
+  <!-- ✅ Burbuja naranja con título + monto -->
+  <div class="bubble-orange">
+    <span>INGRESOS APROXIMADOS DEL CLIENTE</span>
+    <div id="outIngreso"></div>
+  </div>
+
   <div class="note">Estas cifras son referenciales y pueden variar.</div>
 
   <button type="button" onclick="resetear()">Nueva consulta</button>
@@ -255,6 +271,8 @@
     outMonto.textContent='S/ '+nf.format(mf);
     outPlazo.textContent=a+' años';
     outTea.textContent=t+' %';
+
+    // Solo el monto (el título ya está en el HTML)
     outIngreso.textContent='S/ '+nf.format(ing);
 
     form.classList.add('hide');
