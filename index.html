@@ -62,8 +62,17 @@
       font-size:22px;
       font-weight:900;
       color:#0f172a;
-      margin:6px 0 22px;
+      margin:6px 0 10px;
       letter-spacing:.02em;
+    }
+
+    /* ✅ NUEVO: nombre del cliente en resultados (círculo rojo) */
+    .subtitle{
+      text-align:center;
+      font-size:14px;
+      font-weight:800;
+      color:#334155;
+      margin:0 0 18px;
     }
 
     .label{
@@ -154,7 +163,6 @@
       color:#78350f;
     }
 
-    /* ✅ Título dentro de la burbuja naranja */
     .bubble-orange span{
       display:block;
       font-size:11px;
@@ -211,6 +219,9 @@
 <div class="card hide" id="result">
   <h1 class="title">Calculadora de Créditos Nattiva</h1>
 
+  <!-- ✅ NUEVO: cliente en el resultado (círculo rojo) -->
+  <div class="subtitle" id="outCliente"></div>
+
   <div class="bubble-blue">
     <span>CUOTA MENSUAL ESTIMADA</span>
     <div id="cuotaMensual"></div>
@@ -218,13 +229,18 @@
 
   <table>
     <tr><td>Precio del inmueble</td><td id="outPrecio"></td></tr>
-    <tr><td>Cuota inicial</td><td id="outCuota"></td></tr>
+
+    <!-- ✅ MODIFICADO: aquí sale Cuota inicial (20%) (círculo amarillo) -->
+    <tr>
+      <td>Cuota inicial (<span id="outCuotaPct"></span>%)</td>
+      <td id="outCuota"></td>
+    </tr>
+
     <tr><td>Monto a financiar</td><td id="outMonto"></td></tr>
     <tr><td>Plazo</td><td id="outPlazo"></td></tr>
     <tr><td>TEA</td><td id="outTea"></td></tr>
   </table>
 
-  <!-- ✅ Burbuja naranja con título + monto -->
   <div class="bubble-orange">
     <span>INGRESOS APROXIMADOS DEL CLIENTE</span>
     <div id="outIngreso"></div>
@@ -250,29 +266,40 @@
 
   function calcular(){
     err.textContent='';
+
+    const nombre = (cliente.value || '').trim();
     const p = num(precio.value);
     const c = num(cuota.value);
     const t = num(tea.value);
     const a = parseInt(plazo.value) || 0;
 
+    if(!nombre) return err.textContent='Ingresa el nombre del cliente';
     if(!p || !c || !t || !a) return err.textContent='Completa todos los campos';
+    if(!(c > 0 && c < 100)) return err.textContent='La cuota inicial debe ser entre 1% y 99%';
 
     const ci = p*(c/100);
     const mf = p-ci;
+
     const r  = Math.pow(1+t/100,1/12)-1;
     const m  = a*12;
 
     const cm = (r === 0) ? (mf/m) : (mf*(r/(1-Math.pow(1+r,-m))));
     const ing = cm/0.3;
 
+    // ✅ NUEVO: nombre del cliente (círculo rojo)
+    outCliente.textContent = nombre;
+
     cuotaMensual.textContent='S/ '+nf.format(cm);
     outPrecio.textContent='S/ '+nf.format(p);
+
+    // ✅ NUEVO: porcentaje en el texto (círculo amarillo)
+    outCuotaPct.textContent = c;
+
     outCuota.textContent='S/ '+nf.format(ci);
     outMonto.textContent='S/ '+nf.format(mf);
     outPlazo.textContent=a+' años';
     outTea.textContent=t+' %';
 
-    // Solo el monto (el título ya está en el HTML)
     outIngreso.textContent='S/ '+nf.format(ing);
 
     form.classList.add('hide');
@@ -285,6 +312,8 @@
     result.classList.add('hide');
     cliente.value=precio.value=cuota.value=tea.value=plazo.value='';
     err.textContent='';
+    outCliente.textContent='';
+    outCuotaPct.textContent='';
   }
 
   // Service Worker
