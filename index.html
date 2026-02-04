@@ -62,36 +62,33 @@
       font-size:22px;
       font-weight:900;
       color:#0f172a;
-      margin:6px 0 6px;
+      margin:6px 0 12px;
     }
 
-    /* 🔥 NOMBRE DEL CLIENTE (MÁS GRANDE) */
-    .subtitle{
-      /* 🔥 FICHA DEL CLIENTE */
-.client-box{
-  margin: 6px auto 22px;
-  padding: 12px 16px;
-  border-radius: 16px;
-  background: #f1f5f9;
-  text-align: center;
-  border: 1px solid rgba(148,163,184,.35);
-}
+    /* 🔥 FICHA DEL CLIENTE */
+    .client-box{
+      margin: 6px auto 22px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: #f1f5f9;
+      text-align: center;
+      border: 1px solid rgba(148,163,184,.35);
+    }
 
-.client-box .label{
-  font-size: 11px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  font-weight: 800;
-  color: #64748b;
-  margin-bottom: 4px;
-}
+    .client-box .label{
+      font-size:11px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-weight:800;
+      color:#64748b;
+      margin-bottom:4px;
+    }
 
-.client-box .name{
-  font-size: 22px;
-  font-weight: 900;
-  color: #0f172a;
-}
-
+    .client-box .name{
+      font-size:22px;
+      font-weight:900;
+      color:#0f172a;
+    }
 
     .label{
       font-size:11px;
@@ -108,6 +105,7 @@
       border-radius:18px;
       border:1px solid rgba(148,163,184,.55);
       font-size:16px;
+      outline:none;
     }
 
     button{
@@ -135,6 +133,7 @@
       text-align:center;
       font-size:36px;
       font-weight:900;
+      color:#0f172a;
     }
 
     .bubble-blue span{
@@ -177,6 +176,7 @@
       display:block;
       font-size:11px;
       letter-spacing:.18em;
+      text-transform:uppercase;
       font-weight:900;
       margin-bottom:8px;
       color:#92400e;
@@ -212,10 +212,10 @@
   <input id="precio" placeholder="Ej: 500,000">
 
   <div class="label">Cuota inicial (%)</div>
-  <input id="cuota" placeholder="Ej: 20">
+  <input id="cuota" placeholder="Ej: 10">
 
   <div class="label">TEA (%)</div>
-  <input id="tea" placeholder="Ej: 10">
+  <input id="tea" placeholder="Ej: 8">
 
   <div class="label">Plazo (años)</div>
   <input id="plazo" placeholder="Ej: 20">
@@ -227,7 +227,11 @@
 <!-- RESULTADO -->
 <div class="card hide" id="result">
   <h1 class="title">Calculadora de Créditos Nattiva</h1>
-  <div class="subtitle" id="outCliente"></div>
+
+  <div class="client-box">
+    <div class="label">Cliente</div>
+    <div class="name" id="outCliente"></div>
+  </div>
 
   <div class="bubble-blue">
     <span>CUOTA MENSUAL ESTIMADA</span>
@@ -255,7 +259,7 @@
   const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2});
   const nfi = new Intl.NumberFormat('en-US');
 
-  function num(v){ return parseFloat((v||'').replace(/,/g,''))||0 }
+  function num(v){return parseFloat((v||'').replace(/,/g,''))||0}
 
   precio.oninput=()=>precio.value=nfi.format(num(precio.value));
 
@@ -263,18 +267,17 @@
     err.textContent='';
     const nombre=cliente.value.trim();
     const p=num(precio.value), c=num(cuota.value), t=num(tea.value), a=parseInt(plazo.value)||0;
-
     if(!nombre||!p||!c||!t||!a) return err.textContent='Completa todos los campos';
 
-    const ci=p*(c/100), mf=p-ci, r=Math.pow(1+t/100,1/12)-1, m=a*12;
+    const ci=p*(c/100), mf=p-ci;
+    const r=Math.pow(1+t/100,1/12)-1, m=a*12;
     const cm=mf*(r/(1-Math.pow(1+r,-m)));
     const ing=cm/0.3;
 
     outCliente.textContent=nombre;
-    outCuotaPct.textContent=c;
-
     cuotaMensual.textContent='S/ '+nf.format(cm);
     outPrecio.textContent='S/ '+nf.format(p);
+    outCuotaPct.textContent=c;
     outCuota.textContent='S/ '+nf.format(ci);
     outMonto.textContent='S/ '+nf.format(mf);
     outPlazo.textContent=a+' años';
@@ -291,11 +294,10 @@
     cliente.value=precio.value=cuota.value=tea.value=plazo.value='';
   }
 
-  if('serviceWorker'in navigator){
-    navigator.serviceWorker.register('./sw.js');
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
 </script>
 
 </body>
 </html>
-
