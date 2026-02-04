@@ -62,17 +62,17 @@
       font-size:22px;
       font-weight:900;
       color:#0f172a;
-      margin:6px 0 10px;
-      letter-spacing:.02em;
+      margin:6px 0 6px;
     }
 
-    /* ✅ NUEVO: nombre del cliente en resultados (círculo rojo) */
+    /* 🔥 NOMBRE DEL CLIENTE (MÁS GRANDE) */
     .subtitle{
       text-align:center;
-      font-size:14px;
-      font-weight:800;
-      color:#334155;
-      margin:0 0 18px;
+      font-size:22px;
+      font-weight:900;
+      color:#0f172a;
+      margin:0 0 22px;
+      text-transform:capitalize;
     }
 
     .label{
@@ -90,12 +90,6 @@
       border-radius:18px;
       border:1px solid rgba(148,163,184,.55);
       font-size:16px;
-      outline:none;
-    }
-
-    input:focus{
-      border-color:rgba(225,29,72,.55);
-      box-shadow:0 0 0 4px rgba(225,29,72,.12);
     }
 
     button{
@@ -123,7 +117,6 @@
       text-align:center;
       font-size:36px;
       font-weight:900;
-      color:#0f172a;
     }
 
     .bubble-blue span{
@@ -144,7 +137,6 @@
     td{
       padding:12px 0;
       border-bottom:1px solid rgba(148,163,184,.25);
-      color:#0f172a;
     }
 
     td:last-child{
@@ -167,7 +159,6 @@
       display:block;
       font-size:11px;
       letter-spacing:.18em;
-      text-transform:uppercase;
       font-weight:900;
       margin-bottom:8px;
       color:#92400e;
@@ -197,29 +188,27 @@
   <h1 class="title">Calculadora de Créditos Nattiva</h1>
 
   <div class="label">Cliente</div>
-  <input id="cliente" placeholder="Ej: Juan Pérez" autocomplete="off">
+  <input id="cliente" placeholder="Ej: Juan Pérez">
 
   <div class="label">Precio del inmueble (S/)</div>
-  <input id="precio" inputmode="numeric" placeholder="Ej: 500,000" autocomplete="off">
+  <input id="precio" placeholder="Ej: 500,000">
 
   <div class="label">Cuota inicial (%)</div>
-  <input id="cuota" inputmode="decimal" placeholder="Ej: 10" autocomplete="off">
+  <input id="cuota" placeholder="Ej: 20">
 
   <div class="label">TEA (%)</div>
-  <input id="tea" inputmode="decimal" placeholder="Ej: 8" autocomplete="off">
+  <input id="tea" placeholder="Ej: 10">
 
   <div class="label">Plazo (años)</div>
-  <input id="plazo" inputmode="numeric" placeholder="Ej: 20" autocomplete="off">
+  <input id="plazo" placeholder="Ej: 20">
 
-  <button type="button" onclick="calcular()">Calcular</button>
+  <button onclick="calcular()">Calcular</button>
   <div class="error" id="err"></div>
 </div>
 
 <!-- RESULTADO -->
 <div class="card hide" id="result">
   <h1 class="title">Calculadora de Créditos Nattiva</h1>
-
-  <!-- ✅ NUEVO: cliente en el resultado (círculo rojo) -->
   <div class="subtitle" id="outCliente"></div>
 
   <div class="bubble-blue">
@@ -229,13 +218,7 @@
 
   <table>
     <tr><td>Precio del inmueble</td><td id="outPrecio"></td></tr>
-
-    <!-- ✅ MODIFICADO: aquí sale Cuota inicial (20%) (círculo amarillo) -->
-    <tr>
-      <td>Cuota inicial (<span id="outCuotaPct"></span>%)</td>
-      <td id="outCuota"></td>
-    </tr>
-
+    <tr><td>Cuota inicial (<span id="outCuotaPct"></span>%)</td><td id="outCuota"></td></tr>
     <tr><td>Monto a financiar</td><td id="outMonto"></td></tr>
     <tr><td>Plazo</td><td id="outPlazo"></td></tr>
     <tr><td>TEA</td><td id="outTea"></td></tr>
@@ -247,78 +230,51 @@
   </div>
 
   <div class="note">Estas cifras son referenciales y pueden variar.</div>
-
-  <button type="button" onclick="resetear()">Nueva consulta</button>
+  <button onclick="resetear()">Nueva consulta</button>
 </div>
 
 <script>
-  const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
-  const nfi = new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
+  const nf = new Intl.NumberFormat('en-US',{minimumFractionDigits:2});
+  const nfi = new Intl.NumberFormat('en-US');
 
-  function onlyDigits(s){ return (s || '').toString().replace(/[^\d]/g,''); }
-  function num(v){ return parseFloat((v || '').toString().replace(/,/g,'')) || 0; }
+  function num(v){ return parseFloat((v||'').replace(/,/g,''))||0 }
 
-  // 500000 -> 500,000 (sin decimales)
-  precio.addEventListener('input', () => {
-    const d = onlyDigits(precio.value);
-    precio.value = d ? nfi.format(parseInt(d,10)) : '';
-  });
+  precio.oninput=()=>precio.value=nfi.format(num(precio.value));
 
   function calcular(){
     err.textContent='';
+    const nombre=cliente.value.trim();
+    const p=num(precio.value), c=num(cuota.value), t=num(tea.value), a=parseInt(plazo.value)||0;
 
-    const nombre = (cliente.value || '').trim();
-    const p = num(precio.value);
-    const c = num(cuota.value);
-    const t = num(tea.value);
-    const a = parseInt(plazo.value) || 0;
+    if(!nombre||!p||!c||!t||!a) return err.textContent='Completa todos los campos';
 
-    if(!nombre) return err.textContent='Ingresa el nombre del cliente';
-    if(!p || !c || !t || !a) return err.textContent='Completa todos los campos';
-    if(!(c > 0 && c < 100)) return err.textContent='La cuota inicial debe ser entre 1% y 99%';
+    const ci=p*(c/100), mf=p-ci, r=Math.pow(1+t/100,1/12)-1, m=a*12;
+    const cm=mf*(r/(1-Math.pow(1+r,-m)));
+    const ing=cm/0.3;
 
-    const ci = p*(c/100);
-    const mf = p-ci;
-
-    const r  = Math.pow(1+t/100,1/12)-1;
-    const m  = a*12;
-
-    const cm = (r === 0) ? (mf/m) : (mf*(r/(1-Math.pow(1+r,-m))));
-    const ing = cm/0.3;
-
-    // ✅ NUEVO: nombre del cliente (círculo rojo)
-    outCliente.textContent = nombre;
+    outCliente.textContent=nombre;
+    outCuotaPct.textContent=c;
 
     cuotaMensual.textContent='S/ '+nf.format(cm);
     outPrecio.textContent='S/ '+nf.format(p);
-
-    // ✅ NUEVO: porcentaje en el texto (círculo amarillo)
-    outCuotaPct.textContent = c;
-
     outCuota.textContent='S/ '+nf.format(ci);
     outMonto.textContent='S/ '+nf.format(mf);
     outPlazo.textContent=a+' años';
     outTea.textContent=t+' %';
-
     outIngreso.textContent='S/ '+nf.format(ing);
 
     form.classList.add('hide');
     result.classList.remove('hide');
-    window.scrollTo(0,0);
   }
 
   function resetear(){
     form.classList.remove('hide');
     result.classList.add('hide');
     cliente.value=precio.value=cuota.value=tea.value=plazo.value='';
-    err.textContent='';
-    outCliente.textContent='';
-    outCuotaPct.textContent='';
   }
 
-  // Service Worker
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  if('serviceWorker'in navigator){
+    navigator.serviceWorker.register('./sw.js');
   }
 </script>
 
